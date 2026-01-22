@@ -1,0 +1,1173 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>買取テンプレート作成ツール</title>
+  <style>
+    :root {
+      --primary: #00796b;
+      --primary-light: #26a69a;
+      --primary-lighter: #4db6ac;
+      --accent: #b2dfdb;
+      --accent-light: #e0f7fa;
+      --bg-output: #f1f8f6;
+      --error: #d32f2f;
+      --success: #43a047;
+      --gray: #78909c;
+      --border-radius: 8px;
+      --shadow: 0 4px 15px rgba(0, 121, 107, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+      background: linear-gradient(135deg, var(--accent-light) 0%, #b2ebf2 100%);
+      color: #333;
+      padding: 20px;
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--primary);
+      font-size: 13px;
+      margin-bottom: 25px;
+      font-weight: 500;
+    }
+
+    .button-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .required {
+      color: var(--error);
+      font-size: 12px;
+      margin-left: 5px;
+    }
+
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 6px;
+      border: 2px solid var(--accent);
+      border-radius: var(--border-radius);
+      font-size: 15px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: white;
+    }
+
+    select {
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%2300796b" d="M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 12px 8px;
+      padding-right: 35px;
+    }
+
+    select.unselected { background-color: #fff0f0; }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #d0d0d0;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    #memo { min-height: 220px; }
+    #telMemo { min-height: 110px; }
+
+    textarea.photo-instructions {
+      min-height: 40px;
+      height: auto;
+      resize: vertical;
+    }
+
+    .red-emphasis {
+      color: var(--error);
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .flex-input {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .flex-input select { flex: 2; min-width: 0; }
+    .flex-input input[type="text"] { flex: 8; min-width: 0; }
+
+    button {
+      width: 30%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #2bbbad 0%, #00897b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 121, 107, 0.4);
+    }
+
+    button:active { transform: translateY(0); }
+
+    .nav-button {
+      width: 32%;
+      min-width: 150px;
+      padding: 12px 20px;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #outputArea, #telOutputArea {
+      background-color: var(--bg-output);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 40px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 15px;
+      transition: min-height 0.3s ease;
+    }
+
+    #copyBtn {
+      background: linear-gradient(135deg, var(--primary-lighter) 0%, var(--primary-light) 100%);
+      margin-top: 0;
+    }
+
+    #copyBtn:hover {
+      background: linear-gradient(135deg, #80cbc4 0%, var(--primary-lighter) 100%);
+    }
+
+    #copyBtn.copied {
+      background: linear-gradient(135deg, #66bb6a 0%, var(--success) 100%);
+    }
+
+    .clear-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .clear-btn {
+      flex: 0 0 30%;
+      background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+      padding: 12px;
+      font-size: 15px;
+    }
+
+    .clear-btn:hover {
+      background: linear-gradient(135deg, #f44336 0%, var(--error) 100%);
+    }
+
+    #memoArea, #telMemoArea {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 2px solid var(--accent);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .annotation {
+      color: var(--error);
+      font-weight: bold;
+      font-size: 14px;
+      text-align: center;
+      margin: 15px 0 10px 0;
+    }
+
+    .manual-content {
+      line-height: 1.9;
+      overflow-y: visible;
+    }
+
+    .manual-content h2 {
+      color: var(--primary);
+      margin-top: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent);
+      font-size: 22px;
+    }
+
+    .manual-content h3 {
+      color: #00897b;
+      margin-top: 25px;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .manual-content ul {
+      margin-left: 25px;
+      margin-bottom: 15px;
+    }
+
+    .manual-content li {
+      margin-bottom: 10px;
+      line-height: 1.8;
+    }
+
+    .manual-content p { margin-bottom: 15px; }
+    .manual-content strong { color: var(--primary); }
+
+    .back-button {
+      background: linear-gradient(135deg, var(--gray) 0%, #546e7a 100%);
+      margin-bottom: 25px;
+    }
+
+    .back-button:hover {
+      background: linear-gradient(135deg, #90a4ae 0%, var(--gray) 100%);
+    }
+
+    .manual-btn-bottom {
+      position: relative;
+      margin-top: 20px;
+      background: linear-gradient(135deg, var(--gray) 0%, #546e7a 100%);
+      padding: 12px;
+      font-size: 15px;
+      width: 100%;
+    }
+
+    .manual-btn-bottom:hover {
+      background: linear-gradient(135deg, #90a4ae 0%, var(--gray) 100%);
+    }
+
+    @media screen and (max-width: 768px) {
+      .container { padding: 20px; min-height: auto; }
+      h1 { font-size: 22px; }
+      .subtitle { font-size: 12px; }
+      button { font-size: 15px; padding: 12px; width: 45%; }
+      .clear-btn { flex: 0 0 45%; }
+      .button-area { flex-direction: column; align-items: stretch; }
+      .nav-button { width: 100%; min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- メイン画面 -->
+  <div id="mainScreen" class="screen active">
+    <h1>買取テンプレート作成ツール</h1>
+    <p class="subtitle">ジャンルを選択すると、必要な項目が自動的に表示されます</p>
+
+    <div class="button-area">
+      <button id="telephoneBtn" class="nav-button">☎受電対応テンプレート</button>
+    </div>
+
+    <div class="form-group">
+      <label for="storeName">【担当店舗・催事】<span class="required">※必須</span></label>
+      <input type="text" id="storeName" placeholder="'店舗名'または'催事'を入力">
+    </div>
+
+    <div class="form-group">
+      <label for="genre">【ジャンル】<span class="required">※必須</span></label>
+      <select id="genre" class="unselected">
+        <option value="">選択してください</option>
+        <option value="バッグ">バッグ</option>
+        <option value="財布・小物">財布・小物</option>
+        <option value="時計">時計</option>
+        <option value="貴金属・アクセサリー">貴金属・アクセサリー</option>
+        <option value="宝石">宝石</option>
+        <option value="アパレル">アパレル</option>
+        <option value="家電">家電</option>
+        <option value="スマホ">スマホ</option>
+        <option value="ホビー">ホビー</option>
+        <option value="お酒">お酒</option>
+        <option value="骨董">骨董</option>
+        <option value="楽器">楽器</option>
+        <option value="日本刀">日本刀</option>
+        <option value="記念硬貨">記念硬貨</option>
+        <option value="古銭">古銭</option>
+        <option value="その他道具類">その他道具類</option>
+        <option value="金券">金券</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+
+    <div id="dynamicFields"></div>
+
+    <button onclick="generateTemplate()">テンプレートを生成</button>
+    <div id="outputArea"></div>
+    <button id="copyBtn" onclick="copyToClipboard()">コピーする</button>
+
+    <div class="clear-buttons">
+      <button class="clear-btn" onclick="clearTemplate()">テンプレートのクリア</button>
+    </div>
+
+    <div id="memoArea">
+      <div class="form-group">
+        <label for="memo">【メモ欄】</label>
+        <textarea id="memo" placeholder="ここにコピーした内容をペーストできます"></textarea>
+      </div>
+      <div class="clear-buttons">
+        <button class="clear-btn" onclick="clearMemo()">メモのクリア</button>
+      </div>
+    </div>
+
+    <button class="manual-btn-bottom" onclick="switchScreen('manual')">使い方マニュアル</button>
+  </div>
+
+  <!-- 受電対応テンプレート画面 -->
+  <div id="telephoneScreen" class="screen">
+    <h1>受電対応テンプレート</h1>
+    <p class="subtitle">電話対応時の記録テンプレートを作成します</p>
+
+    <button class="back-button" onclick="switchScreen('main')">← 買取テンプレートに戻る</button>
+
+    <div class="form-group">
+      <label for="telStoreName">【店舗/会場名】<span class="required">※必須</span></label>
+      <input type="text" id="telStoreName" placeholder="店舗名・催事シフト名">
+    </div>
+
+    <div class="form-group">
+      <label for="telRequest">【依頼】</label>
+      <input type="text" id="telRequest" placeholder="問い合わせ、電話出張、そのほか">
+    </div>
+
+    <div class="form-group">
+      <label for="telCustomerName">【お客様氏名（カタカナ）】</label>
+      <input type="text" id="telCustomerName" placeholder="キムラ　キョウスケ">
+    </div>
+
+    <div class="form-group">
+      <label for="telPhoneNumber">【電話番号】</label>
+      <input type="text" id="telPhoneNumber" placeholder="※来店予約や問い合わせのみの場合は不要">
+    </div>
+
+    <div class="form-group">
+      <label for="telCustomerInfo">【お客様情報】</label>
+      <div class="flex-input">
+        <select id="telCustomerInfoSelect" class="unselected">
+          <option value="">選択してください</option>
+          <option value="男性">男性</option>
+          <option value="女性">女性</option>
+          <option value="その他">その他</option>
+        </select>
+        <input type="text" id="telCustomerInfoText" placeholder="ややせっかち、他店合い見積もり、リピ　など">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="telProduct">【商品】</label>
+      <input type="text" id="telProduct" placeholder="H10万円金貨、着物　など">
+    </div>
+
+    <div class="form-group">
+      <label for="telContent">【内容】</label>
+      <textarea id="telContent" placeholder="金額問い合わせ、取り扱い確認、来店時間&#10;→担当者より折り返しご案内"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="telAddress">【住所】（※出張の場合）</label>
+      <input type="text" id="telAddress" placeholder="">
+    </div>
+
+    <div class="form-group">
+      <label for="telParking">【駐車場】（※出張の場合）</label>
+      <div class="flex-input">
+        <select id="telParkingSelect" class="unselected">
+          <option value="">選択してください</option>
+          <option value="有">有</option>
+          <option value="無">無</option>
+          <option value="未確認">未確認</option>
+        </select>
+        <input type="text" id="telParkingText" placeholder="駐車場備考：近くにコインパーキングのみ有　など">
+      </div>
+    </div>
+
+    <button onclick="generateTelephoneTemplate()">テンプレートを生成</button>
+    <div id="telOutputArea"></div>
+    
+    <p class="annotation">※担当・店舗にメンション</p>
+    
+    <button id="telCopyBtn" onclick="copyTelephoneToClipboard()">コピーする</button>
+
+    <div class="clear-buttons">
+      <button class="clear-btn" onclick="clearTelephoneTemplate()">テンプレートのクリア</button>
+    </div>
+
+    <div id="telMemoArea">
+      <div class="form-group">
+        <label for="telMemo">【メモ欄】</label>
+        <textarea id="telMemo" placeholder="メモ"></textarea>
+      </div>
+      <div class="clear-buttons">
+        <button class="clear-btn" onclick="clearTelMemo()">メモのクリア</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- マニュアル画面 -->
+  <div id="manualScreen" class="screen">
+    <h1>使い方マニュアル</h1>
+    <button class="back-button" onclick="switchScreen('main')">← メイン画面に戻る</button>
+    
+    <div class="manual-content">
+      <h2>📖 このツールについて</h2>
+      <p>買取業務で使用するテンプレートを効率的に作成できるツールです。</p>
+
+      <h2>🔧 基本的な使い方</h2>
+      <ol>
+        <li><strong>【担当店舗・催事】と【ジャンル】を入力</strong>（必須）</li>
+        <li><strong>ジャンル別項目を入力</strong>（中分類、ブランド名など）</li>
+        <li><strong>写真撮影指示を確認</strong></li>
+        <li><strong>「テンプレートを生成」をクリック</strong></li>
+        <li><strong>「コピーする」でクリップボードにコピー</strong></li>
+      </ol>
+
+      <h2>✨ 主な機能</h2>
+      <ul>
+        <li><strong>動的フィールド表示</strong>: ジャンル選択で必要な項目が自動表示</li>
+        <li><strong>コピー機能</strong>: ワンクリックでテンプレートをコピー</li>
+        <li><strong>クリア機能</strong>: テンプレートまたはメモを個別にクリア</li>
+        <li><strong>メモ欄</strong>: 一時的なメモや保存に使用可能</li>
+      </ul>
+
+      <h2>🔎 補足事項</h2>
+      <ul>
+        <li>プルダウンで「選択してください」のままの項目は反映されません</li>
+        <li>空欄の項目も反映されません</li>
+        <li>未選択のプルダウンは薄いピンク色で表示されます</li>
+      </ul>
+      
+      <h2>⚠️ 注意事項</h2>
+      <ul>
+        <li>「見立て金額」は任意です。自身の相場観の勉強にお役立てください。</li>
+        <li>コピーボタンが反応しない場合は、生成されたテンプレートを直接コピーしてください。</li>
+      </ul>
+
+      <h2>📸 写真撮影のポイント</h2>
+      <p>ジャンルごとに撮影指示が表示されます。</p>
+      <p>シリアル番号や刻印はアップで撮影し、ダメージ箇所は必ず撮影してください。</p>
+      
+      <h2></h2>
+        <p><strong>不具合やご不明な点、改善要望は研修課までお気軽にお問い合わせください。</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 共通フィールド定義
+  const commonFields = {
+    customerPrice: { label: "【お客様希望額】", id: "customerPrice", type: "text", placeholder: "" },
+    estimatedPrice: { label: "【見立て金額】", id: "estimatedPrice", type: "text", placeholder: "" },
+    remarks: { label: "【備考】", id: "remarks", type: "text", placeholder: "" }
+  };
+
+  const conditionField = (hasText = false) => ({
+    label: "【状態】",
+    id: "condition",
+    type: hasText ? "select+text" : "text",
+    options: hasText ? ["未使用品", "A品", "AB品", "B品", "BC品", "C品", "D品"] : undefined,
+    placeholder: hasText ? "状態備考を入力してください（任意）" : "例: 使用感あり、小傷あり、美品"
+  });
+
+  // ジャンルデータ（最適化版）
+  const genreData = {
+    "バッグ": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["トート", "ショルダー", "クラッチ", "ハンド", "リュック", "ボストン", "ポーチ", "ビジネス", "その他"] },
+        { label: "【ブランド名】", id: "brandName", type: "text", placeholder: "例: ヴィトン、エルメス、シャネル" },
+        { label: "【型番／モデル名】", id: "modelName", type: "text", placeholder: "例: M40156　ネヴァーフルMM" },
+        { label: "【シリアル】", id: "serial", type: "text", placeholder: "例: CA1234" },
+        { label: "【サイズ】", id: "size", type: "text", placeholder: "例: W30cm×H25cm×D12cm" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、保存袋、ショルダーストラップ" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体正面/背面\n・ブランドロゴ/ファスナー刻印（ピントを合わせてアップで）\n・角やハンドルなど擦れやすい箇所（ショルダー等の付け根注意）\n・ダメージ箇所（内側も確認）\n・付属品（箱、保証書、レシートなど）\n※臭いがある場合は備考に記入する"
+    },
+    "財布・小物": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["長財布", "二つ折り", "三つ折り", "コインケース", "カードケース", "キーケース", "その他"] },
+        { label: "【ブランド名】", id: "brandName", type: "text", placeholder: "例: ヴィトン、グッチ、プラダ" },
+        { label: "【型番／モデル名】", id: "modelName", type: "text", placeholder: "例: M42616　ジッピーウォレット" },
+        { label: "【シリアル】", id: "serial", type: "text", placeholder: "例: MI1234" },
+        { label: "【サイズ】", id: "size", type: "text", placeholder: "例: W19cm×H10cm×D2cm" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、保存袋" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・表面、裏面の全体写真\n・内側を開いた状態（カードポケット、小銭入れが見えるように）\n・ブランドロゴ\n・角や折り目など擦れやすい箇所\n・ファスナーや金具部分\n・付属品（箱、保証書、レシートなど）"
+    },
+    "時計": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["自動巻き", "クォーツ", "手巻き", "ソーラー", "スマートウォッチ", "その他"] },
+        { label: "【ブランド名】", id: "brandName", type: "text", placeholder: "例: ロレックス、オメガ、タグホイヤー" },
+        { label: "【モデル名・型番】", id: "modelName", type: "text", placeholder: "例: サブマリーナー 116610LN" },
+        { label: "【動作確認】", id: "operationCheck", type: "select", options: ["動作", "不動"] },
+        { label: "【ケースサイズ】", id: "caseSize", type: "text", placeholder: "例: 40mm" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、保証書、ギャランティカード、コマ" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・引きで時計全体（ベルトも含んで表や裏複数枚OK）\n・本体の正面写真（文字盤がはっきり分かるように）\n・裏蓋/刻印（シリアルや刻印が見えるように）\n・ブレス垂れ（ロレックスのジュビリーブレス\n・側面やリューズ部分\n・傷や擦れがある箇所（ある場合複数枚）\n・付属品（箱、保証書、余りコマなど）"
+    },
+    "貴金属・アクセサリー": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["ネックレス", "リング", "ブレスレット", "ピアス/イヤリング", "ブローチ", "その他"] },
+        { label: "【ブランド名】", id: "brandName", type: "text", placeholder: "例: ティファニー、カルティエ、読めないが刻印あり　など" },
+        { label: "【商品名】", id: "productName", type: "text", placeholder: "例: ラブブレス" },
+        { label: "【素材】", id: "material", type: "text", placeholder: "例: Pt950、K18YG" },
+        { label: "【重量】", id: "weight", type: "text", placeholder: "例: 10.5g" },
+        { label: "【刻印】", id: "engraving", type: "text", placeholder: "例: Pt950、K18、ブランド刻印" },
+        conditionField(),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、保証書、鑑定書、鑑別書" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体の写真\n・刻印部分（Pt、K18、ブランド刻印など）をアップで\n・留め具やチェーン部分\n・傷や変色がある箇所\n・付属品（箱、保証書など）"
+    },
+    "宝石": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["ネックレス", "リング", "ブレスレット", "ピアス/イヤリング", "ブローチ", "その他"] },
+        { label: "【ブランド】", id: "brandName", type: "text", placeholder: "例: カルティエ、ティファニー、ハリーウィンストン、ミキモト　など" },
+        { label: "【メイン石の種類】", id: "gemType", type: "text", placeholder: "例: ダイヤモンド、ルビー、アレキサンドライト、パール　など" },
+        { label: "【メイン石の重量（ｃｔ）】", id: "carat", type: "text", placeholder: "例: 0.56ct" },
+        { label: "【メイン石詳細】", id: "clarity", type: "text", placeholder: "例: H、SI1、GOOD（ダイヤの場合）/パール7～7.5㎜　など" },
+        { label: "【素材】", id: "material", type: "text", placeholder: "例: Pt900/K18　など" },
+        { label: "【総重量】", id: "totalWeight", type: "text", placeholder: "例: 15.2g" },
+        { label: "【刻印】", id: "engraving", type: "text", placeholder: "例: 0.56/0.2/ブランド刻印　など" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 小傷あり、サビあり　など" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 鑑定書、鑑別書、ケース" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・宝石全体の写真\n・複数の角度から撮影（正面、側面、裏面）\n・刻印のアップ（ピントを合わせて）\n・メイン石の実物に近い色\n・光を当てた状態での輝きがわかる写真\n・インクルージョン（内包物）が見える場合はアップで\n・傷や欠けがある場合はその箇所をアップで\n・鑑定書/鑑別書",
+      redEmphasis: "※白背景で撮影すること"
+    },
+    "アパレル": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["ジャケット", "コート", "パンツ", "スカート", "ワンピース", "シャツ/ブラウス", "ニット", "Tシャツ", "その他"] },
+        { label: "【ブランド名】", id: "brandName", type: "text", placeholder: "例: シャネル、グッチ、エルメス" },
+        { label: "【商品名】", id: "productName", type: "text", placeholder: "例: ツイードジャケット" },
+        { label: "【サイズ表記】", id: "sizeLabel", type: "text", placeholder: "例: 38、M、9号" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 予備ボタン、ハンガー、タグ" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体写真（ハンガーにかけた状態、または平置き）\n・正面、背面\n・ブランドタグやサイズ、素材表記タグ\n・汚れ、シミ、ほつれ、毛玉などダメージ箇所\n・裏地の状態\n・付属品"
+    },
+    "家電": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["テレビ", "掃除機", "電子レンジ", "炊飯器", "パソコン・タブレット", "カメラ", "オーディオ機器", "ゲーム機", "その他"] },
+        { label: "【メーカー名】", id: "manufacturer", type: "text", placeholder: "例: パナソニック、ソニー、東芝" },
+        { label: "【型番】", id: "modelNumber", type: "text", placeholder: "例: TH-55JZ2000" },
+        { label: "【製造年】", id: "manufactureYear", type: "text", placeholder: "例: 2021年製" },
+        { label: "【動作確認】", id: "operationCheck", type: "select", options: ["動作確認済み", "通電確認済", "未チェック"] },
+        { label: "【サイズ・スペック】", id: "specs", type: "text", placeholder: "例: 13インチ/win11/Corei7/メモリ16GB など" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: リモコン、電源ケーブル、取扱説明書、元箱" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体の写真\n・型番シール\n・製造年月の記載部分\n・傷や汚れがある箇所\n・付属品（説明書やコード類）"
+    },
+    "スマホ": {
+      fields: [
+        { label: "【メーカー】", id: "manufacturer", type: "text", placeholder: "例: アップル、サムスン、グーグル" },
+        { label: "【型番・機種名】", id: "modelName", type: "text", placeholder: "例: MQ173J/A　iPhone14Pro" },
+        { label: "【容量】", id: "storage", type: "text", placeholder: "例: 128GB、256GB、512GB" },
+        { label: "【キャリア】", id: "networkRestriction", type: "select", options: ["ドコモ", "ソフトバンク", "ａｕ", "ＵＱ", "mineo", "Ｙモバイル", "その他"] },
+        { label: "【ネットワーク利用制限】", id: "networkRestriction", type: "select", options: ["〇", "△", "×", "－"] },
+        { label: "【バッテリー状態】", id: "batteryHealth", type: "text", placeholder: "例: 88%" },
+        conditionField(true),
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、充電ケーブル、イヤホン" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体（正面、背面、側面）\n・ダメージ箇所（へこみ、ガラス割れ注意）\n・カメラレンズ部分\n・付属品（箱、保証書、コード類など）"
+    },
+    "ホビー": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["フィギュア", "プラモデル", "トレカ", "ゲームソフト", "おもちゃ", "その他"] },
+        { label: "【商品名】", id: "productName", type: "text", placeholder: "例: ワンピース フィギュア ルフィ" },
+        { label: "【メーカー】", id: "manufacturer", type: "text", placeholder: "例: バンダイ、タカラトミー" },
+        { label: "【発売年】", id: "releaseYear", type: "text", placeholder: "例: 2023年" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 未開封、開封済み美品、箱なし" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 外箱、内箱、説明書、特典" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・商品全体の写真\n・外箱（未開封の場合はシュリンク付きの状態）\n・付属品や特典\n・傷や破損がある箇所\n・鑑定ケース（あれば内容が分かるように）"
+    },
+    "お酒": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["ウイスキー", "ブランデー", "ワイン", "日本酒", "焼酎", "シャンパン", "その他"] },
+        { label: "【銘柄】", id: "brand", type: "text", placeholder: "例: 山崎25年、ヘネシーXO" },
+        { label: "【容量】", id: "volume", type: "text", placeholder: "例: 700ml、750ml" },
+        { label: "【度数】", id: "alcoholContent", type: "text", placeholder: "例: 43%、40%" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 目減り、ラベル汚れあり" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 箱、替え栓、冊子" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・ボトル全体の写真（正面、背面）\n・ラベル部分（銘柄、容量、度数がはっきり見えるように）\n・液面の高さがわかる写真\n・キャップやコルクの状態\n・ボトルの底\n・ラベルの汚れや破れがある箇所\n・付属品",
+      redEmphasis: "※匂いがする場合は漏れている"
+    },
+    "骨董": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["箱有り", "箱無し", "大型商品", "大量", "その他"] },
+        { label: "【作家名】", id: "artistName", type: "text", placeholder: "例: 人間国宝〇〇" },
+        { label: "【作品名】", id: "artworkName", type: "text", placeholder: "例: 志野茶碗" },
+        { label: "【サイズ】", id: "size", type: "text", placeholder: "例: 高さ10cm、直径15cm" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: ヒビあり、欠けあり" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 鑑定書、由来書、共布" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・骨董品全体の写真（複数の角度から）\n・銘や落款（サイン）部分をアップで\n・共箱の表面と内側（箱書きがある場合）\n・傷、ヒビ、欠け、修復箇所\n・高台（陶磁器の底部分）\n・付属品"
+    },
+    "楽器": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["ギター", "ベース", "管楽器", "弦楽器", "和楽器", "その他"] },
+        { label: "【メーカー/ブランド】", id: "manufacturer", type: "text", placeholder: "例: フェンダー、ギブソン、ヤマハ" },
+        { label: "【モデル名・型番】", id: "modelName", type: "text", placeholder: "例: ストラトキャスター、レスポール" },
+        { label: "【シリアル番号】", id: "serial", type: "text", placeholder: "例: V123456" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: クラック、フレット減り、へこみあり" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: ケース、ストラップ、ピック、保証書" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・楽器全体の写真（正面、背面、側面）\n・ブランドロゴやモデル名の記載部分\n・シリアル番号\n・フレットやネックの状態（ギター/ベースの場合）\n・傷や打痕がある箇所\n・付属品"
+    },
+    "日本刀": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["短刀（～１尺（～30.3cm）未満）", "脇差（～２尺（～60.6cm）未満）", "刀（～２尺（60.6cm）以上）", "槍", "薙刀", "その他"] },
+        { label: "【銘】", id: "inscription", type: "text", placeholder: "例: 〇〇（刀工名）、無銘" },
+        { label: "【刃長】", id: "bladeLength", type: "text", placeholder: "例: 70.5cm" },
+        { label: "【目釘穴数】", id: "mekugiHoles", type: "text", placeholder: "例: ２個" },
+        { label: "【身幅】※元幅（刀身の根本あたり）", id: "bodyWidth", type: "text", placeholder: "例: 2.8cm", templateLabel: "【身幅】※元幅" },
+        { label: "【白鞘or拵】", id: "mounting", type: "select", options: ["白鞘", "拵", "白鞘と拵どちらも付属"] },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 錆あり、刃こぼれあり、良好" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 鑑定書" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "※刃長はメジャーをあてた写真\n※茎（なかご）（柄を外したところ）の写真\n・刀身全体の写真\n・切っ先（刀の先端部分）\n・刃文がわかる写真・白鞘または拵の写真\n・錆や刃こぼれがある箇所\n・登録証\n・付属品",
+      redEmphasis: "※種類や刃長、銘が登録証と違う場合買取不可の可能性大"
+    },
+    "記念硬貨": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["金貨", "銀貨", "紙幣", "その他"] },
+        { label: "【種類】", id: "type", type: "text", placeholder: "例: 天皇陛下御在位記念10万円金貨" },
+        { label: "【素材】", id: "material", type: "text", placeholder: "例: 純金、純銀" },
+        { label: "【重量】", id: "weight", type: "text", placeholder: "例: 30g" },
+        { label: "【比重値】", id: "specificGravity", type: "text", placeholder: "例: 19.3" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 未使用、傷あり" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: ケース、ブリスター、保証書" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体（表/裏）\n・デザインアップ\n・重量・比重を量った写真（必要であれば）"
+    },
+    "古銭": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["金貨", "銀貨", "その他"] },
+        { label: "【種類】", id: "type", type: "text", placeholder: "例: 小判、大判" },
+        { label: "【素材】", id: "material", type: "text", placeholder: "例: 金、銀" },
+        { label: "【重量】", id: "weight", type: "text", placeholder: "例: 15g" },
+        { label: "【比重値】", id: "specificGravity", type: "text", placeholder: "例: 19.3" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "例: 摩耗あり、良好" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "例: 鑑定書" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・全体（表/裏）\n・デザインアップ\n・重量・比重を量った写真（必要であれば）"
+    },
+    "その他道具類": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["釣具", "ゴルフ道具", "電動工具", "香水", "その他"] },
+        { label: "【メーカー】", id: "manufacturer", type: "text", placeholder: "" },
+        { label: "【種類】", id: "type", type: "text", placeholder: "" },
+        { label: "【型番・モデル名】", id: "modelNumber", type: "text", placeholder: "" },
+        { label: "【状態】", id: "condition", type: "text", placeholder: "" },
+        { label: "【付属品】", id: "accessories", type: "text", placeholder: "" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・型番などがわかる部分(ラベルなど)があれば撮影推奨"
+    },
+    "金券": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "select", options: ["切手", "中国切手", "海外切手", "ギフト券", "各種カード類", "株主優待券", "その他"] },
+        { label: "【種類】", id: "type", type: "text", placeholder: "" },
+        { label: "【額面】", id: "faceValue", type: "text", placeholder: "" },
+        { label: "【有効期限】", id: "expiryDate", type: "text", placeholder: "" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・表面/裏面\n・ダメージ箇所"
+    },
+    "その他": {
+      fields: [
+        { label: "【中分類】", id: "subcategory", type: "text", placeholder: "自由入力" },
+        { label: "【メーカー】", id: "manufacturer", type: "text", placeholder: "" },
+        { label: "【型番などの特徴】", id: "modelFeatures", type: "text", placeholder: "" },
+        commonFields.customerPrice,
+        commonFields.estimatedPrice,
+        commonFields.remarks
+      ],
+      photoInstructions: "・型番やモデル名が分かるものがあれば撮影推奨"
+    }
+  };
+
+  // ユーティリティ関数
+  const notifyHeightChange = () => {
+    if (window.parent !== window) {
+      const height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, 
+        document.body.offsetHeight, document.documentElement.offsetHeight,
+        document.body.clientHeight, document.documentElement.clientHeight);
+      window.parent.postMessage({ type: 'resize', height: height }, '*');
+    }
+  };
+
+  const forceNotifyHeight = () => {
+    notifyHeightChange();
+    [100, 300, 600, 1000].forEach(delay => setTimeout(notifyHeightChange, delay));
+  };
+
+  const autoResizeTextarea = (textarea) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.max(40, textarea.scrollHeight) + 'px';
+    forceNotifyHeight();
+  };
+
+  const updateSelectStyle = (selectElement) => {
+    selectElement.classList.toggle('unselected', !selectElement.value || selectElement.value === "選択してください");
+  };
+
+  const switchScreen = (screen) => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen === 'main' ? 'mainScreen' : 
+                           screen === 'manual' ? 'manualScreen' : 'telephoneScreen').classList.add('active');
+    forceNotifyHeight();
+  };
+
+  // 動的フィールド生成
+  const genreSelect = document.getElementById('genre');
+  genreSelect.addEventListener('change', function() {
+    updateSelectStyle(this);
+    const genre = this.value;
+    const dynamicFields = document.getElementById('dynamicFields');
+    dynamicFields.innerHTML = '';
+
+    if (!genre || !genreData[genre]) return;
+
+    const data = genreData[genre];
+    data.fields.forEach(field => {
+      const formGroup = document.createElement('div');
+      formGroup.className = 'form-group';
+
+      const label = document.createElement('label');
+      label.textContent = field.label;
+      formGroup.appendChild(label);
+
+      if (field.type === 'select') {
+        const select = document.createElement('select');
+        select.id = field.id;
+        select.className = 'unselected';
+        select.innerHTML = '<option value="">選択してください</option>' + 
+          field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        select.addEventListener('change', () => updateSelectStyle(select));
+        formGroup.appendChild(select);
+      } else if (field.type === 'select+text') {
+        const flexDiv = document.createElement('div');
+        flexDiv.className = 'flex-input';
+
+        const select = document.createElement('select');
+        select.id = field.id + 'Select';
+        select.style.flex = '3';
+        select.className = 'unselected';
+        select.innerHTML = '<option value="">選択してください</option>' + 
+          field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+        select.addEventListener('change', () => updateSelectStyle(select));
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = field.id + 'Text';
+        input.placeholder = field.placeholder;
+        input.style.flex = '7';
+
+        flexDiv.append(select, input);
+        formGroup.appendChild(flexDiv);
+      } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = field.id;
+        input.placeholder = field.placeholder;
+        formGroup.appendChild(input);
+      }
+
+      dynamicFields.appendChild(formGroup);
+    });
+
+    // 写真撮影指示
+    if (data.photoInstructions) {
+      const photoGroup = document.createElement('div');
+      photoGroup.className = 'form-group';
+      
+      const photoLabel = document.createElement('label');
+      photoLabel.textContent = '【写真撮影指示】';
+      photoGroup.appendChild(photoLabel);
+
+      if (data.redEmphasis) {
+        const redText = document.createElement('span');
+        redText.className = 'red-emphasis';
+        redText.textContent = data.redEmphasis;
+        photoGroup.appendChild(redText);
+      }
+
+      const photoTextarea = document.createElement('textarea');
+      photoTextarea.className = 'photo-instructions';
+      photoTextarea.readOnly = true;
+      photoTextarea.value = data.photoInstructions;
+      photoTextarea.style.backgroundColor = '#f9f9f9';
+      setTimeout(() => autoResizeTextarea(photoTextarea), 100);
+      
+      photoGroup.appendChild(photoTextarea);
+      dynamicFields.appendChild(photoGroup);
+    }
+
+    forceNotifyHeight();
+  });
+
+  // テンプレート生成関数
+  const getFieldValue = (field) => {
+    if (field.type === 'select') {
+      const elem = document.getElementById(field.id);
+      return elem && elem.value && elem.value !== '選択してください' ? elem.value : null;
+    } else if (field.type === 'select+text') {
+      const select = document.getElementById(field.id + 'Select');
+      const input = document.getElementById(field.id + 'Text');
+      const selectVal = select?.value;
+      const inputVal = input?.value.trim();
+      
+      if (selectVal && selectVal !== '選択してください') {
+        return inputVal ? `${selectVal}（${inputVal}）` : selectVal;
+      }
+      return inputVal || null;
+    } else {
+      const elem = document.getElementById(field.id);
+      return elem?.value.trim() || null;
+    }
+  };
+
+  const generateTemplate = () => {
+    const storeName = document.getElementById('storeName').value.trim();
+    const genre = genreSelect.value;
+
+    if (!storeName) return alert('【担当店舗・催事】を入力してください。');
+    if (!genre) return alert('【ジャンル】を選択してください。');
+
+    let template = `【担当店舗・催事】\n${storeName}\n【ジャンル】\n${genre}\n`;
+
+    const data = genreData[genre];
+    if (data) {
+      data.fields.forEach(field => {
+        const value = getFieldValue(field);
+        if (value) {
+          // templateLabelがあればそれを使用、なければfield.labelを使用
+          const displayLabel = field.templateLabel || field.label;
+          template += `${displayLabel}\n${value}\n`;
+        }
+      });
+    }
+
+    const outputArea = document.getElementById('outputArea');
+    outputArea.textContent = template;
+    outputArea.style.minHeight = Math.max(40, outputArea.scrollHeight) + 'px';
+    forceNotifyHeight();
+  };
+
+  // ========== コピー機能（互換性強化版） ==========
+
+  // メインのコピー関数（買取テンプレート用）
+  const copyToClipboard = () => {
+    const text = document.getElementById('outputArea').textContent;
+    if (!text) return alert('テンプレートが生成されていません。');
+
+    // 新しい方法を優先的に試す
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => showCopySuccess('copyBtn'))
+        .catch(() => fallbackCopy(text, 'copyBtn')); // 失敗時は古い方法
+    } else {
+      // 新しい方法が使えない環境では最初から古い方法
+      fallbackCopy(text, 'copyBtn');
+    }
+  };
+
+  // 受電対応テンプレート用
+  const copyTelephoneToClipboard = () => {
+    const text = document.getElementById('telOutputArea').textContent;
+    if (!text) return alert('テンプレートが生成されていません。');
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => showCopySuccess('telCopyBtn'))
+        .catch(() => fallbackCopy(text, 'telCopyBtn'));
+    } else {
+      fallbackCopy(text, 'telCopyBtn');
+    }
+  };
+
+  // フォールバック方式（古い方法・全ブラウザ対応）
+  const fallbackCopy = (text, btnId = 'copyBtn') => {
+    // 一時的な非表示テキストエリアを作成
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.width = '2em';
+    textarea.style.height = '2em';
+    textarea.style.padding = '0';
+    textarea.style.border = 'none';
+    textarea.style.outline = 'none';
+    textarea.style.boxShadow = 'none';
+    textarea.style.background = 'transparent';
+    textarea.style.opacity = '0';
+    textarea.setAttribute('readonly', '');
+    
+    document.body.appendChild(textarea);
+    
+    // iOS対応の選択処理
+    if (navigator.userAgent.match(/ipad|iphone/i)) {
+      const range = document.createRange();
+      range.selectNodeContents(textarea);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      textarea.setSelectionRange(0, text.length);
+    } else {
+      textarea.select();
+    }
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showCopySuccess(btnId);
+      } else {
+        alert('コピーに失敗しました。テキストを手動で選択してコピーしてください。');
+      }
+    } catch (err) {
+      console.error('コピーエラー:', err);
+      alert('コピーに失敗しました。');
+    }
+    
+    document.body.removeChild(textarea);
+  };
+
+  // コピー成功時の視覚フィードバック
+  const showCopySuccess = (btnId) => {
+    const btn = document.getElementById(btnId);
+    const originalText = btn.textContent;
+    
+    btn.textContent = 'コピーしました!';
+    
+    if (btnId === 'copyBtn') {
+      btn.classList.add('copied');
+    } else if (btnId === 'telCopyBtn') {
+      btn.style.background = 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)';
+    }
+    
+    setTimeout(() => {
+      btn.textContent = originalText;
+      
+      if (btnId === 'copyBtn') {
+        btn.classList.remove('copied');
+      } else if (btnId === 'telCopyBtn') {
+        btn.style.background = 'linear-gradient(135deg, #4db6ac 0%, #26a69a 100%)';
+      }
+    }, 2000);
+  };
+
+  // ========== ここまでコピー機能 ==========
+
+  const clearTemplate = () => {
+    const outputArea = document.getElementById('outputArea');
+    outputArea.textContent = '';
+    outputArea.style.minHeight = '40px';
+    forceNotifyHeight();
+  };
+
+  const clearMemo = () => document.getElementById('memo').value = '';
+  const clearTelMemo = () => document.getElementById('telMemo').value = '';
+
+  // 受電対応テンプレート
+  const generateTelephoneTemplate = () => {
+    const storeName = document.getElementById('telStoreName').value.trim();
+    if (!storeName) return alert('【店舗/会場名】を入力してください。');
+
+    let template = `【店舗/会場名】\n${storeName}\n`;
+
+    const fields = [
+      { label: '【依頼】', id: 'telRequest' },
+      { label: '【お客様氏名（カタカナ）】', id: 'telCustomerName' },
+      { label: '【電話番号】', id: 'telPhoneNumber' },
+      { label: '【商品】', id: 'telProduct' },
+      { label: '【内容】', id: 'telContent' },
+      { label: '【住所】（※出張の場合）', id: 'telAddress', templateLabel: '【住所】' }
+    ];
+
+    fields.forEach(field => {
+      const value = document.getElementById(field.id)?.value.trim();
+      if (value) {
+        const displayLabel = field.templateLabel || field.label;
+        template += `${displayLabel}\n${value}\n`;
+      }
+    });
+
+    // お客様情報
+    const customerSelect = document.getElementById('telCustomerInfoSelect')?.value;
+    const customerText = document.getElementById('telCustomerInfoText')?.value.trim();
+    if (customerSelect && customerSelect !== '選択してください') {
+      template += `【お客様情報】\n${customerText ? `${customerSelect}（${customerText}）` : customerSelect}\n`;
+    } else if (customerText) {
+      template += `【お客様情報】\n${customerText}\n`;
+    }
+
+    // 駐車場
+    const parkingSelect = document.getElementById('telParkingSelect')?.value;
+    const parkingText = document.getElementById('telParkingText')?.value.trim();
+    if (parkingSelect && parkingSelect !== '選択してください') {
+      template += `【駐車場】\n${parkingText ? `${parkingSelect}（${parkingText}）` : parkingSelect}\n`;
+    } else if (parkingText) {
+      template += `【駐車場】\n${parkingText}\n`;
+    }
+
+    const telOutputArea = document.getElementById('telOutputArea');
+    telOutputArea.textContent = template;
+    telOutputArea.style.minHeight = Math.max(40, telOutputArea.scrollHeight) + 'px';
+    forceNotifyHeight();
+  };
+
+  const clearTelephoneTemplate = () => {
+    const telOutputArea = document.getElementById('telOutputArea');
+    telOutputArea.textContent = '';
+    telOutputArea.style.minHeight = '40px';
+    forceNotifyHeight();
+  };
+
+  // イベントリスナー
+  document.getElementById('telephoneBtn').addEventListener('click', () => switchScreen('telephone'));
+  
+  ['telCustomerInfoSelect', 'telParkingSelect'].forEach(id => {
+    const elem = document.getElementById(id);
+    if (elem) elem.addEventListener('change', () => updateSelectStyle(elem));
+  });
+
+  // 初期化
+  window.onload = () => {
+    setTimeout(forceNotifyHeight, 300);
+
+    const manualContent = document.querySelector('.manual-content');
+    if (manualContent) {
+      new MutationObserver(forceNotifyHeight).observe(manualContent, {
+        childList: true, subtree: true, characterData: true
+      });
+    }
+
+    let checkCount = 0;
+    const heightChecker = setInterval(() => {
+      notifyHeightChange();
+      if (++checkCount > 60) {
+        clearInterval(heightChecker);
+        setInterval(notifyHeightChange, 2000);
+      }
+    }, 500);
+  };
+
+  if ('ontouchstart' in window) {
+    document.body.style.webkitOverflowScrolling = 'touch';
+  }
+</script>
+
+</body>
+</html>
